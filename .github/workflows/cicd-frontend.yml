@@ -1,0 +1,59 @@
+name: CI/CD Frontend - Despacho Dashboard
+
+# Se activa SOLO cuando hay push en la rama deploy
+on:
+  push:
+    branches:
+      - deploy
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── PASO 1: Descargar el código ──────────────────────
+      - name: "1. Checkout del codigo"
+        uses: actions/checkout@v4
+
+      # ── PASO 2: Configurar credenciales AWS ──────────────
+      - name: "2. Configurar credenciales AWS"
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region:            ${{ secrets.AWS_REGION }}
+
+      # ── PASO 3: Login a Amazon ECR ───────────────────────
+      - name: "3. Login a Amazon ECR"
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # ── PASO 4: Construir imagen Docker ──────────────────
+      - name: "4. Build de la imagen Docker"
+        run: |
+          docker build -t frontend-despacho .
+
+      # ── PASO 5: Etiquetar imagen para ECR ────────────────
+      - name: "5. Etiquetar imagen para ECR"
+        run: |
+          docker tag frontend-despacho:latest ${{ secrets.ECR_REGISTRY }}/frontend-despacho:latest
+
+      # ── PASO 6: Subir imagen a ECR ───────────────────────
+      - name: "6. Push imagen a Amazon ECR"
+        run: |
+          docker push ${{ secrets.ECR_REGISTRY }}/frontend-despacho:latest
+
+      # ── PASO 7: Desplegar en EC2-Web via SSM ─────────────
+      - name: "7. Deploy en EC2-Web"
+        run: |
+          aws ssm send-command \
+            --instance-ids ${{ secrets.EC2_FRONTEND_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}",
+              "docker pull ${{ secrets.ECR_REGISTRY }}/frontend-despacho:latest",
+              "docker stop frontend-despacho || true",
+              "docker rm frontend-despacho || true",
+              "docker run -d --name frontend-despacho --restart always -p 80:80 ${{ secrets.ECR_REGISTRY }}/frontend-despacho:latest"
+            ]' \
+            --region us-east-1
