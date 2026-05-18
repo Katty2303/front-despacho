@@ -8,7 +8,7 @@ export const TableCompras = () => {
 
   const compras = async () => {
     await axios
-      .get("http://98.90.149.0/api/v1/ventas", {
+      .get("http://98.90.149.0:8080/api/v1/ventas", {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
