@@ -1,10 +1,6 @@
-\# Frontend Despacho Dashboard
-
-
+\# Frontend Despacho Dashboard (DevOps)
 
 Aplicación web desarrollada en React + Vite + Tailwind CSS para la gestión de despachos y ventas de ITPCARGO™.
-
-
 
 \## Tecnologías
 
@@ -18,19 +14,13 @@ Aplicación web desarrollada en React + Vite + Tailwind CSS para la gestión de 
 
 \- GitHub Actions (CI/CD)
 
-
-
 \## Requisitos previos
 
 \- Docker Desktop instalado
 
 \- Node.js 18 o superior
 
-
-
 \## Cómo ejecutar localmente
-
-
 
 \### Con Docker Compose
 
@@ -41,8 +31,6 @@ docker compose up -d
 ```
 
 Accede en: http://localhost
-
-
 
 \### Sin Docker
 
@@ -56,8 +44,6 @@ npm run dev
 
 Accede en: http://localhost:5173
 
-
-
 \## Variables de entorno
 
 | Variable | Descripción |
@@ -66,31 +52,27 @@ Accede en: http://localhost:5173
 
 | No requiere variables de entorno para el frontend estático |
 
-
-
 \## Estructura del proyecto
 
-front\_despacho/
+front_despacho/
 
-├── Dockerfile          # Multi-stage build (Node builder + Nginx)
+├── Dockerfile # Multi-stage build (Node builder + Nginx)
 
-├── docker-compose.yml  # Stack de servicios
+├── docker-compose.yml # Stack de servicios
 
-├── nginx.conf          # Configuración del servidor web
+├── nginx.conf # Configuración del servidor web
 
-├── .dockerignore       # Archivos excluidos del build
+├── .dockerignore # Archivos excluidos del build
 
 ├── .github/
 
-│   └── workflows/
+│ └── workflows/
 
-│       └── cicd-frontend.yml  # Pipeline CI/CD
+│ └── cicd-frontend.yml # Pipeline CI/CD
 
-├── src/                # Código fuente React
+├── src/ # Código fuente React
 
-└── public/             # Archivos estáticos
-
-
+└── public/ # Archivos estáticos
 
 \## Pipeline CI/CD
 
@@ -102,8 +84,6 @@ El pipeline se activa automáticamente con cada push a la rama `deploy`:
 
 3\. Despliega en EC2-Web via SSH
 
-
-
 \## Infraestructura AWS
 
 \- \*\*EC2-Web\*\*: Instancia pública (subred pública) — accesible desde Internet
@@ -112,13 +92,9 @@ El pipeline se activa automáticamente con cada push a la rama `deploy`:
 
 \- \*\*IP pública\*\*: 98.90.149.0
 
-
-
 \## Persistencia de datos
 
 El frontend es estático, no requiere volúmenes de persistencia.
-
-
 
 \## Principios DevOps aplicados
 
@@ -129,4 +105,3 @@ El frontend es estático, no requiere volúmenes de persistencia.
 \- \*\*Mínimo privilegio\*\*: Usuario `appuser` no-root dentro del contenedor
 
 \- \*\*Optimización\*\*: Imagen final liviana con Nginx Alpine
-
